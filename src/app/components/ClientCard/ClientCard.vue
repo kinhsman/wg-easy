@@ -38,6 +38,7 @@
         <ClientCardEdit :client="client" />
         <ClientCardQRCode :client="client" />
         <ClientCardConfig :client="client" />
+        <ClientCardCopyConfig :client="client" />
         <ClientCardOneTimeLinkBtn :client="client" />
       </div>
     </div>

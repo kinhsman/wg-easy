@@ -31,11 +31,6 @@
 const props = defineProps<{ triggerClass?: string; clientId: number }>();
 
 const toast = useToast();
-const { copied, copy, isSupported } = useClipboard({
-  // fallback does not work
-  legacy: false,
-});
-
 const {
   data: config,
   status,
@@ -57,26 +52,10 @@ async function copyCode() {
     return;
   }
 
-  if (!isSupported.value) {
-    toast.showToast({
-      type: 'error',
-      message: $t('copy.notSupported'),
-    });
-    return;
-  }
-
-  await copy(config.value ?? '');
-
-  if (copied.value) {
-    toast.showToast({
-      type: 'success',
-      message: $t('copy.copied'),
-    });
-  } else {
-    toast.showToast({
-      type: 'error',
-      message: $t('copy.failed'),
-    });
-  }
+  const ok = await copyText(config.value ?? '');
+  toast.showToast({
+    type: ok ? 'success' : 'error',
+    message: ok ? $t('copy.copied') : $t('copy.failed'),
+  });
 }
 </script>

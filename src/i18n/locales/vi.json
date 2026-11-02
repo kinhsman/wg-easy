@@ -106,6 +106,7 @@
     "noPrivKey": "Người dùng này không có khóa riêng tư. Không thể tạo cấu hình.",
     "showQR": "Hiển thị mã QR",
     "downloadConfig": "Tải cấu hình",
+    "copyConfig": "Sao chép cấu hình",
     "allowedIpsDesc": "Các IP sẽ được định tuyến qua VPN (ghi đè cấu hình chung)",
     "serverAllowedIpsDesc": "Các IP mà máy chủ sẽ định tuyến đến người dùng",
     "mtuDesc": "Đặt đơn vị truyền tải tối đa - MTU (kích thước gói tin) cho VPN",
