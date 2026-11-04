@@ -29,6 +29,15 @@ RUN apk add linux-headers build-base go git && \
     make && \
     sed -i 's|\[\[ $proto == -4 \]\] && cmd sysctl -q net\.ipv4\.conf\.all\.src_valid_mark=1|[[ $proto == -4 ]] \&\& [[ $(sysctl -n net.ipv4.conf.all.src_valid_mark) != 1 ]] \&\& cmd sysctl -q net.ipv4.conf.all.src_valid_mark=1|' ./wg-quick/linux.bash
 
+# WireRoute relay (see wireroute-relay/README.md)
+FROM docker.io/library/node:krypton-alpine@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53 AS build-relay
+RUN apk add --no-cache go
+WORKDIR /relay
+COPY wireroute-relay/go.mod wireroute-relay/go.sum ./
+RUN go mod download
+COPY wireroute-relay/ ./
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /wireroute-relay .
+
 FROM docker.io/library/node:krypton-alpine@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53 AS build-libsql
 WORKDIR /app
 RUN npm install --no-save --omit=dev libsql
@@ -57,6 +66,11 @@ RUN chmod +x /usr/bin/amneziawg-go
 COPY --from=build /app/amneziawg-tools/src/wg /usr/bin/awg
 COPY --from=build /app/amneziawg-tools/src/wg-quick/linux.bash /usr/bin/awg-quick
 RUN chmod +x /usr/bin/awg /usr/bin/awg-quick
+
+# WireRoute relay, started next to wg-easy
+COPY --from=build-relay /wireroute-relay /usr/local/bin/wireroute-relay
+COPY wireroute-relay/start.sh /usr/local/bin/wg-easy-start
+RUN chmod +x /usr/local/bin/wireroute-relay /usr/local/bin/wg-easy-start
 
 # Install Linux packages
 RUN apk add --no-cache \
@@ -88,4 +102,4 @@ ENV DISABLE_IPV6=false
 LABEL org.opencontainers.image.source=https://github.com/wg-easy/wg-easy
 
 # Run Web UI
-CMD ["/usr/bin/dumb-init", "node", "server/index.mjs"]
+CMD ["/usr/bin/dumb-init", "/usr/local/bin/wg-easy-start"]

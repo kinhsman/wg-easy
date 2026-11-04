@@ -1,5 +1,7 @@
-# Builds this fork's wg-easy (15.5.0 + Copy Configuration button) for
-# amd64 and arm64 and publishes it as ghcr.io/<owner>/wg-easy:15.5.0-copy.
+# Builds this fork's wg-easy (15.5.0 + Copy Configuration button + WireRoute
+# relay) for amd64 and arm64 and publishes it as
+# ghcr.io/<owner>/wg-easy:15.5.0-copy. Run it by hand with another tag to
+# publish a test image first.
 # Same approach as upstream's deploy.yml: each platform builds natively,
 # then the digests are merged into one multi-platform tag.
 
@@ -7,6 +9,10 @@ name: Custom image
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Image tag to publish
+        default: 15.5.0-copy
   push:
     branches: [15.5.0-copy]
 
@@ -16,7 +22,7 @@ concurrency:
 
 env:
   IMAGE: ghcr.io/${{ github.repository_owner }}/wg-easy
-  TAG: 15.5.0-copy
+  TAG: ${{ inputs.tag || '15.5.0-copy' }}
 
 jobs:
   build:
@@ -84,7 +90,7 @@ jobs:
           retention-days: 1
 
   merge:
-    name: Publish ${{ github.repository_owner }}/wg-easy:15.5.0-copy
+    name: Publish ${{ github.repository_owner }}/wg-easy:${{ inputs.tag || '15.5.0-copy' }}
     runs-on: ubuntu-latest
     needs: build
     permissions:
