@@ -15,8 +15,8 @@ Safety:
   WireGuard interface (`wg0`) from the VPN's own network. Nothing to open on
   your router; it is invisible from the internet and the LAN.
 - VPN users can already reach the internet through this server; the relay
-  gives them nothing new. It refuses to connect to the server itself
-  (loopback).
+  gives them nothing new. It only connects to public internet addresses:
+  never the server itself, its home network, or VPN/Tailscale addresses.
 - Plain WireGuard clients are not affected.
 
 Settings (environment variables):
